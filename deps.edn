@@ -6,12 +6,13 @@
         com.cognitect.aws/cloudformation {:mvn/version "847.2.1365.0"}
 
         ch.qos.logback/logback-classic {:mvn/version "1.4.7"}
+        camel-snake-kebab/camel-snake-kebab {:mvn/version "0.4.3"}
         tick/tick {:mvn/version "0.6.2"}}
 
  :tools/usage {:ns-default form.core}
 
  :aliases {:test
-           {:extra-paths ["test"]
+           {:extra-paths ["." "test"]
             :extra-deps {lambdaisland/kaocha {:mvn/version "1.67.1055"}
                          clj-http/clj-http {:mvn/version "3.12.3"}
                          cheshire/cheshire {:mvn/version "5.11.0"}}

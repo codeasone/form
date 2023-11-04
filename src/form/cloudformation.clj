@@ -1,45 +1,32 @@
 (ns form.cloudformation
-  (:require [clojure.java.io :as io]
+  (:require [camel-snake-kebab.core :as csk]
+            [clojure.java.io :as io]
             [clojure.java.shell :refer [sh]]
             [clojure.string :as str]
             [cognitect.aws.client.api :as aws]
-            [cognitect.aws.credentials :as credentials]
             [form.codec :as codec]
             [form.terminal :as terminal]
+            [form.util :as util]
             [tick.core :as t]
             [tick.locale-en-us]))
 
 (def aws-region (or (System/getenv "AWS_REGION") "eu-west-1"))
 (def polling-interval-ms 5000)
 
-(defn form-aws-endpoint []
-  (System/getenv "FORM_AWS_ENDPOINT"))
-
 (def ^:dynamic *cloudformation-client*
-  (aws/client (cond-> {:api :cloudformation
-                       :region (keyword aws-region)}
-                (form-aws-endpoint)
-                (assoc :endpoint-override {:protocol :http
-                                           :hostname (form-aws-endpoint)
-                                           :port 4566}
-                       :credentials-provider (credentials/basic-credentials-provider
-                                              {:access-key-id "placeholder"
-                                               :secret-access-key "placeholder"})))))
+  (aws/client {:api :cloudformation
+               :region (keyword aws-region)}))
 
 (defn- stack-params
-  [{:keys [organisation environment application version]}]
-  [{:ParameterKey "Organisation"
-    :ParameterValue organisation}
-   {:ParameterKey "Environment"
-    :ParameterValue environment}
-   {:ParameterKey "Application"
-    :ParameterValue application}
-   {:ParameterKey "MajorVersion"
-    :ParameterValue version}])
+  [provision-params]
+  (mapv (fn [[k v]]
+          {:ParameterKey (->> k name csk/->PascalCaseString)
+           :ParameterValue v})
+        (dissoc provision-params :technology :interactive)))
 
 (defn- stack-name
-  [{:keys [organisation environment application technology version]}]
-  (str/join "-" [organisation environment application technology (str "v" version)]))
+  [{:keys [environment application technology version]}]
+  (str/join "-" [environment application technology (str "v" version)]))
 
 (defn- template-for-stack [technology]
   (if-let [template-resource (io/resource (format "cloudformation/template-%s.yml" technology))]
@@ -173,6 +160,8 @@
     (if (:cognitect.anomalies/category response)
       (do
         (terminal/error! (format "failed to create change set [%s]" change-set-name))
+        (when-let [anomaly (:cognitect.anomalies/message response)]
+          (terminal/error! anomaly))
         (when-let [message (get-in response [:ErrorResponse :Error :Message])]
           (terminal/error! message)))
       (do
@@ -216,7 +205,7 @@
       (if interactive
         (let [console-link (console-link-for-change-set stack-name change-set-id)]
           (terminal/link! console-link)
-          (ask! "Do you to execute the change set?"
+          (ask! "Do you want to execute the change set?"
                 #(execute-change-set! stack-name change-set-name change-set-id)))
         (execute-change-set! stack-name change-set-name change-set-id)))))
 
@@ -230,12 +219,12 @@
       (if interactive
         (let [console-link (console-link-for-change-set stack-name change-set-id)]
           (terminal/link! console-link)
-          (ask! "Do you to execute the change set?"
+          (ask! "Do you want to execute the change set?"
                 #(execute-change-set! stack-name change-set-name change-set-id)))
         (execute-change-set! stack-name change-set-name change-set-id)))))
 
 (defn- protected? [environment]
-  (let [protected-environments #{"production"}]
+  (let [protected-environments #{"prod" "production"}]
     (protected-environments environment)))
 
 (defn- update-termination-protection! [{:keys [environment] :as provision-params}]
@@ -268,11 +257,19 @@
   (aws/doc *cloudformation-client* :ExecuteChangeSet)
   (aws/doc *cloudformation-client* :UpdateTerminationProtection)
 
-  (provision! {:organisation "form"
-               :environment "staging"
+  ;; Example usage which will error due to missing UniqueId parameter
+  (provision! {:environment "staging"
                :application "testing"
                :technology "s3"
                :version 1
+               :interactive true})
+
+  ;; And a working alternative
+  (provision! {:environment "staging"
+               :application "testing"
+               :technology "s3"
+               :version 1
+               :unique-id (util/uuid)
                :interactive true})
   ;;
   )

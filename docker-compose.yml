@@ -9,11 +9,6 @@ services:
       - "4566:4566"
     environment:
       - REGION=eu-west-1
-      - DEFAULT_REGION=eu-west-1
-      - DEBUG=true
-      - DOCKER_HOST=unix:///var/run/docker.sock
-      - PERSISTENCE=1
-      - SNAPSHOT_SAVE_STRATEGY=manual
-      - SNAPSHOT_LOAD_STRATEGY=manual
+      # - DEBUG=true
     volumes:
       - "/var/run/docker.sock:/var/run/docker.sock"
