@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  localstack:
+    hostname: localstack
+    container_name: localstack
+    image: localstack/localstack
+    ports:
+      - "4566:4566"
+    environment:
+      - REGION=eu-west-1
+      - DEFAULT_REGION=eu-west-1
+      - DEBUG=true
+      - DOCKER_HOST=unix:///var/run/docker.sock
+      - PERSISTENCE=1
+      - SNAPSHOT_SAVE_STRATEGY=manual
+      - SNAPSHOT_LOAD_STRATEGY=manual
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"

@@ -1,0 +1,20 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: S3 resources
+Parameters:
+  Organisation:
+    Type: String
+
+  Environment:
+    Type: String
+
+  Application:
+    Type: String
+
+  MajorVersion:
+    Type: String
+
+Resources:
+  TestS3Bucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName: !Sub ${Organisation}-${Environment}-${Application}-renamed-v${MajorVersion}

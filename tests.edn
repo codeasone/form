@@ -1,0 +1,8 @@
+#kaocha/v1
+ {:color? true
+  :fail-fast? false
+  :kaocha.plugin.randomize/randomize? false
+  :kaocha.plugin.profiling/count 50
+  :kaocha.plugin.profiling/profiling? true
+  :plugins [:kaocha.plugin/profiling]
+  :reporter [kaocha.report/documentation]}
