@@ -1,0 +1,55 @@
+name: coding-standard
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Cache cljfmt
+        uses: actions/cache@v3
+        with:
+          path: ./cljfmt
+          key: cljfmt-0.11.2
+
+      - name: Download cljfmt
+        run: |
+          if [ ! -f "./cljfmt" ]; then
+            curl -o /tmp/cljfmt.tar.gz -sL "https://github.com/weavejester/cljfmt/releases/download/0.11.2/cljfmt-0.11.2-linux-amd64-static.tar.gz"
+            tar -xzf /tmp/cljfmt.tar.gz -C .
+          fi
+
+      - name: Run cljfmt fix
+        run: ./cljfmt fix
+
+      - name: Unformatted files
+        run: echo $(git diff-files)
+
+      - name: Check for modified files
+        run: |
+          if [[ $(git diff --stat) != '' ]]; then
+            echo 'Please run yarn format and commit changes.';
+            exit 1;
+          fi
+
+      - name: Cache clj-kondo
+        uses: actions/cache@v3
+        with:
+          path: ./clj-kondo
+          key: clj-kondo-2023.10.20
+
+      - name: Download clj-kondo
+        run: |
+          if [ ! -f "./clj-kondo" ]; then
+            curl -o /tmp/clj-kondo.zip -sL "https://github.com/clj-kondo/clj-kondo/releases/download/v2023.10.20/clj-kondo-2023.10.20-linux-static-amd64.zip"
+            unzip /tmp/clj-kondo.zip -d .
+          fi
+
+      - name: Run clj-kondo --lint
+        run: ./clj-kondo --lint .
