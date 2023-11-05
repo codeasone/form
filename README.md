@@ -26,7 +26,7 @@ clj -Ttools remove :tool form
 
 ## Prerequisites 
 
-Clojure >= `1.10.3.933` (with support for [tools](https://clojure.org/releases/tools#v1.10.3.933)) on the machine or container on which you want to run `form`. 
+Clojure >= `1.10.3.933` (with support for [tools](https://clojure.org/releases/tools#v1.10.3.933)) on the machine or container on which you want to run it. 
 
 In order to work `form` needs access credentials and uses the AWS `BasicCredentialsProvider` to obtain them. 
 
@@ -49,7 +49,7 @@ For example, if you're provisioning an `rds` stack for a service called `account
 staging-accounts-rds-v1
 ```
 
-CloudFormation template files corresponding to these stacks must reside within a `cloudformation/` folder in the directory in which you're running the `form` tool. 
+CloudFormation template files corresponding to these stacks must reside within a `cloudformation/` folder in the directory in which you're running the tool (usually the base directory of your project). 
 
 Each template file must be named `template-<technology>.yml` according to what its constituent resources relate to, for example: 
 
@@ -61,7 +61,7 @@ cloudformation/
 └── ...
 ```
 
-__Note:__ it's sensible to group resources according to AWS service types such as `rds`, but the `<technology>` name can be anything you like. For instance, in the list of example templates shown above, `main` could be used as label for grouping ECS resources associated with the "main" application of the project. 
+__Note:__ whilst it's sensible to group resources according to AWS service types such as `rds`, the `<technology>` name can be anything you like. For instance, in the list of example templates shown above, `main` could be used as a name for grouping ECS resources associated with the "main" application of the project. 
 
 If you're not interested in partitioning the resources for your project, you *could* have one `<technology>` grouping such as `all`, and one corresponding `template-all.yml`, but managing the lifecycle of all resources in one stack has its downsides, so this usage is not advised. 
 
@@ -85,7 +85,7 @@ Here's a preview of what you'll see when you create the `staging-accounts-s3-v1`
 
 If `:version` is not provided then the default value of `1` is used and resulting stacks will be suffixed `v1`. Many projects will never extend beyond `v1`, but if needed it's good to know that the organisational scheme scales to accommodate it. 
 
-By default `form` runs with `:interactive true` and will prompt you to review-and-approve any changes, with handy context-specific AWS console links. 
+By default, `form` runs with `:interactive true` and will prompt you to review-and-approve any changes, with handy context-specific AWS console links. 
 
 For CI usage, this mode can be disabled with `:interactive false`. 
 

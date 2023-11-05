@@ -4,7 +4,7 @@ A simple (but opinionated) tool for managing project-specific AWS resources with
 
 ## [Unreleased]
 
-## [0.1.0]
+## [0.1.0] - 2023-11-05
 
 ### Added
 - Initial version
