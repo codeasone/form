@@ -24,14 +24,6 @@ To uninstall:
 clj -Ttools remove :tool form
 ```
 
-## Prerequisites 
-
-Clojure >= `1.10.3.933` (with support for [tools](https://clojure.org/releases/tools#v1.10.3.933)) on the machine or container on which you want to run it. 
-
-In order to work `form` needs access credentials and uses the AWS `BasicCredentialsProvider` to obtain them. 
-
-It will derive credentials from `.aws/{credentials,config}` if those files exist, or via `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` environment variables.
-
 ## Mental model 
 
 Four parameters establish context: 
@@ -87,7 +79,7 @@ If `:version` is not provided then the default value of `1` is used and resultin
 
 By default, `form` runs with `:interactive true` and will prompt you to review-and-approve any changes, with handy context-specific AWS console links. 
 
-For CI usage, this mode can be disabled with `:interactive false`. 
+For CI usage, this mode can be disabled with `:interactive false`, with the AWS console links still appearing in the output for later inspection. 
 
 ## Safety 
 
@@ -101,11 +93,11 @@ Until then, to delete stacks you'll need to use the AWS console or another tool.
 
 ## Why not just use the awscli tool? 
 
-Adopting `form` into your project is as much about introducing a structured and consistent approach to naming and grouping AWS resources, as being a handy tool. 
+Adopting `form` into your project is as much about introducing a structured and consistent approach to naming and grouping AWS resources, as it is about leveraging a handy tool. 
 
 It works well in environments consisting of 10s or 100s of services, deployed across multiple environments, where there needs to be a quick and unambiguous answer to the questions like "what resources is the project `accounts` using in `staging`?" 
 
-The terminal-based UX of `form` has evolved through numerous incarnations over the past 7 years or so. Variants of it have been used by multiple teams for IaC development and debugging, to deploy production systems, as well as in the context of numerous CI testing rigs. 
+The terminal-based UX of `form` has evolved through numerous incarnations over the past 7 years or so. Variants of it have been used for IaC development and debugging, to deploy production systems, as well as in the context of numerous CI testing rigs. 
 
 The visual output, handy console links, and timestamped status updates, together with the interactive features, are field tested and have proven to be useful enough to merit the creation of this tool. 
 
@@ -124,6 +116,12 @@ just test
 ```
 
 Or alternatively invoke tests from within your editor or REPL, as you prefer.
+
+## Prerequisites 
+
+Clojure >= `1.10.3.933` (with support for [tools](https://clojure.org/releases/tools#v1.10.3.933)) on the machine or container on which you want to run it. 
+
+In order to work `form` obtains credentials from `.aws` files or via `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` via the AWS `BasicCredentialsProvider`.
 
 ## Some ideas and next steps 
 
